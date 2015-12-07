@@ -445,7 +445,7 @@
                 } ]
             },
             "Path": "/",
-            "ManagedPolicyArns": ["arn:aws:iam::aws:policy/AWSCodeCommitReadOnly"]
+            "ManagedPolicyArns": ["arn:aws:iam::aws:policy/AWSCodeCommitReadOnly", "arn:aws:iam::aws:policy/service-role/AmazonAPIGatewayPushToCloudWatchLogs"]
         }
     },
     "GitReaderInstanceProfile": 
