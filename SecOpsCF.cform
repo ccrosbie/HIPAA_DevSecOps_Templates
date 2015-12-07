@@ -4,9 +4,9 @@
   "Parameters": {
     "DeveloperUserScript":
     {
-      "Description": "My customer user input script",
+      "Description": "Provide URL to AWS CodeCommit repository",
       "Type": "String",
-      "ConstraintDescription": "Provide S3 shell script to run"
+      "ConstraintDescription": "Provide URL to AWS CodeCommit repository"
     },
     "KeyName": {
       "Description": "Name of an existing EC2 KeyPair to enable SSH access to TEST instance or Admin SSH access to Prod instance",
@@ -425,10 +425,47 @@
     }
   },
   "Resources": {
+
+    "GitReaderRole": 
+    {
+         "Type": "AWS::IAM::Role",
+         "Properties": 
+         {
+            "AssumeRolePolicyDocument": 
+            {
+               "Version" : "2012-10-17",
+               "Statement": 
+               [ {
+                "Effect": "Allow",
+                 "Principal": 
+                  {
+                     "Service": [ "ec2.amazonaws.com" ]
+                  },
+                  "Action": [ "sts:AssumeRole" ]
+                } ]
+            },
+            "Path": "/",
+            "ManagedPolicyArns": ["arn:aws:iam::aws:policy/AWSCodeCommitReadOnly"]
+        }
+    },
+    "GitReaderInstanceProfile": 
+    {
+        "Type": "AWS::IAM::InstanceProfile",
+        "Properties": 
+        {
+           "Path": "/",
+           "Roles": [ { "Ref": "GitReaderRole" } ]
+        }
+    },
+
+
     "EC2Instance": {
       "Type": "AWS::EC2::Instance",
       "Properties": {
 
+      "Monitoring": "true",
+
+      "IamInstanceProfile": {"Ref": "GitReaderInstanceProfile"},
         
       "Tags":[ 
         { "Key" : "PHI", "Value" : {"Ref": "PHI"} },
