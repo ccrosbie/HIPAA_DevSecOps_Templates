@@ -514,8 +514,8 @@
             "",
             [
             "#!/bin/bash\n",
-            "yum update\n",
-            "yum install -y awslogs\n" 
+            "yum update -y\n",
+            "yum install -y awslogs git httpd\n" 
             ]
           ]
         }
