@@ -16,7 +16,7 @@
     },
     "PHI":
     {
-      "Description": "Will this instance contain Protected Health Information?",
+      "Description": "Will this instance need to store Protected Health Information?",
       "Default": "YES",
       "Type": "String",
        "AllowedValues": [
@@ -426,7 +426,7 @@
   },
   "Resources": {
 
-    "GitReaderRole": 
+    "HIPAAWebRole": 
     {
          "Type": "AWS::IAM::Role",
          "Properties": 
@@ -448,13 +448,13 @@
             "ManagedPolicyArns": ["arn:aws:iam::aws:policy/AWSCodeCommitReadOnly", "arn:aws:iam::aws:policy/service-role/AmazonAPIGatewayPushToCloudWatchLogs"]
         }
     },
-    "GitReaderInstanceProfile": 
+    "HIPAAWebInstanceProfile": 
     {
         "Type": "AWS::IAM::InstanceProfile",
         "Properties": 
         {
            "Path": "/",
-           "Roles": [ { "Ref": "GitReaderRole" } ]
+           "Roles": [ { "Ref": "HIPAAWebRole" } ]
         }
     },
 
@@ -465,7 +465,7 @@
 
       "Monitoring": "true",
 
-      "IamInstanceProfile": {"Ref": "GitReaderInstanceProfile"},
+      "IamInstanceProfile": {"Ref": "HIPAAWebInstanceProfile"},
         
       "Tags":[ 
         { "Key" : "PHI", "Value" : {"Ref": "PHI"} },
@@ -506,6 +506,28 @@
       "KeyName": {
           "Ref": "KeyName"
         },
+
+      "UserData" : 
+      { "Fn::Base64" : 
+        { "Fn::Join" : 
+          [ 
+            "",
+            [
+            "#!/bin/bash\n",
+            "yum update -y\n",
+            "yum install -y awslogs git httpd\n", 
+            "service awslogs start\n",
+            "chkconfig awslogs on\n",
+            "wget https://crosbie-training-materials.s3.amazonaws.com/fakehipaa.crt -P /etc/pki/tls/certs\n",
+            "wget https://crosbie-training-materials.s3.amazonaws.com/fakehipaa.key -P /etc/pki/tls/private/\n",
+            "wget https://crosbie-training-materials.s3.amazonaws.com/fakehipaa.csr -P /etc/pki/tls/private/\n",
+            "wget https://crosbie-training-materials.s3.amazonaws.com/ssl.conf\n",
+            "service httpd start\n",
+            "chkconfig httpd on\n",
+            ]
+          ]
+        }
+      },
 
         "SecurityGroups": [{
           "Fn::If": [

@@ -515,7 +515,15 @@
             [
             "#!/bin/bash\n",
             "yum update -y\n",
-            "yum install -y awslogs git httpd\n" 
+            "yum install -y awslogs git httpd\n", 
+            "service awslogs start\n",
+            "chkconfig awslogs on\n",
+            "service httpd start\n",
+            "chkconfig httpd on\n",
+            "wget https://crosbie-training-materials.s3.amazonaws.com/fakehipaa.crt -P /etc/pki/tls/certs\n",
+            "wget https://crosbie-training-materials.s3.amazonaws.com/fakehipaa.key -P /etc/pki/tls/private/\n",
+            "wget https://crosbie-training-materials.s3.amazonaws.com/fakehipaa.csr -P /etc/pki/tls/private/\n",
+            "wget https://crosbie-training-materials.s3.amazonaws.com/ssl.conf -P /etc/pki/tls/certs\n"
             ]
           ]
         }
