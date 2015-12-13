@@ -523,7 +523,12 @@
             "wget https://crosbie-training-materials.s3.amazonaws.com/fakehipaa.csr -P /etc/pki/tls/private/\n",
             "wget https://crosbie-training-materials.s3.amazonaws.com/ssl.conf -P /etc/httpd/conf.d/ssl.conf\n",
             "service httpd start\n",
-            "chkconfig httpd on\n"
+            "chkconfig httpd on\n",
+            "git config --global credential.helper '!aws codecommit credential-helper $@'\n",
+            "git config --global credential.UseHttpPath true\n",
+            "cd /tmp\n",
+            "git clone https://git-codecommit.us-east-1.amazonaws.com/v1/repos/DevSecOpsExampleRepo TempCode\n",
+            "cp /tmp/TempCode/index.html /var/www/html/index.html"
             ]
           ]
         }
