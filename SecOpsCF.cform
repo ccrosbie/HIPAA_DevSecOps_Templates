@@ -4,10 +4,17 @@
   "Parameters": {
     "CodeCommitRepo":
     {
-      "Description": "Provide URL to AWS CodeCommit repository",
+      "Description": "Provide the HTTPS clone URL to AWS CodeCommit repository",
       "Type": "String",
       "MinLength": 25,
-      "ConstraintDescription": "Provide URL to AWS CodeCommit repository"
+      "ConstraintDescription": "Provide the HTTPS clone URL to AWS CodeCommit repository"
+    },
+    "WebDirectory":
+    {
+      "Description": "Provide the website directory name",
+      "Type": "String",
+      "MinLength": 2,
+      "ConstraintDescription": "Provide the website directory name you wish to use"
     },
     "KeyName": {
       "Description": "Name of an existing EC2 KeyPair to enable SSH access to TEST instance or Admin SSH access to Prod instance",
@@ -542,7 +549,7 @@
             "cd /var/www/html\n",
             "echo in the content directory of $(pwd)\n",
      
-            "git clone ",  {"Ref": "CodeCommitRepo"}, " \n",
+            "git clone ",  {"Ref": "CodeCommitRepo"}, " ", {"Ref": "WebDirectory"},  " \n",
             "echo project cloned\n"
 
             ]
@@ -610,22 +617,20 @@
         "Ref": "EC2Instance"
       }
     },
-    "AZ": {
-      "Description": "Availability Zone of the newly created compliant EC2 instance",
-      "Value": {
-        "Fn::GetAtt": [
-          "EC2Instance",
-          "AvailabilityZone"
-        ]
-      }
-    },
-    "PublicDNS": {
-      "Description": "Public DNSName of the newly created compliant EC2 instance",
-      "Value": {
-        "Fn::GetAtt": [
-          "EC2Instance",
-          "PublicDnsName"
-        ]
+    "CompliantWebsiteURL": {
+      "Description": "URL of the newly created compliant website",
+      "Value": 
+      {
+        "Fn::Join" : 
+          [ 
+            "",
+            [
+              "https://",
+              {"Fn::GetAtt": ["EC2Instance","PublicDnsName"]},
+              "/",
+              {"Ref": "WebDirectory"} 
+            ]
+          ]  
       }
     },
     "PublicIP": {
