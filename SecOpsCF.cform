@@ -2,10 +2,11 @@
   "AWSTemplateFormatVersion" : "2010-09-09",
   "Description": "Crosbie's DevSecOps Example: Shows an example of a template used in a fictious HIPAA example",
   "Parameters": {
-    "DeveloperUserScript":
+    "CodeCommitRepo":
     {
       "Description": "Provide URL to AWS CodeCommit repository",
       "Type": "String",
+      "MinLength": 25,
       "ConstraintDescription": "Provide URL to AWS CodeCommit repository"
     },
     "KeyName": {
@@ -514,21 +515,36 @@
             "",
             [
             "#!/bin/bash\n",
+            "echo starting crosbie script\n",
+
             "yum update -y\n",
             "yum install -y awslogs git httpd mod_ssl\n", 
+            "echo updates and packages installed\n",
+
             "service awslogs start\n",
             "chkconfig awslogs on\n",
+            "echo aws logs installed and turned on\n",
+
             "wget https://crosbie-training-materials.s3.amazonaws.com/fakehipaa.crt -P /etc/pki/tls/certs\n",
             "wget https://crosbie-training-materials.s3.amazonaws.com/fakehipaa.key -P /etc/pki/tls/private/\n",
             "wget https://crosbie-training-materials.s3.amazonaws.com/fakehipaa.csr -P /etc/pki/tls/private/\n",
             "wget https://crosbie-training-materials.s3.amazonaws.com/ssl.conf -P /etc/httpd/conf.d/ssl.conf\n",
             "service httpd start\n",
             "chkconfig httpd on\n",
-            "git config --global credential.helper '!aws codecommit credential-helper $@'\n",
-            "git config --global credential.UseHttpPath true\n",
-            "cd /tmp\n",
-            "git clone https://git-codecommit.us-east-1.amazonaws.com/v1/repos/DevSecOpsExampleRepo TempCode\n",
-            "cp /tmp/TempCode/index.html /var/www/html/index.html"
+            "echo Web server security configured and running\n",
+
+     
+            "git config --system credential.https://git-codecommit.us-east-1.amazonaws.com.helper '!aws --profile default codecommit credential-helper $@'\n",
+            "git config --system credential.https://git-codecommit.us-east-1.amazonaws.com.UseHttpPath true\n",
+            "aws configure set region us-east-1\n",
+            "echo Git configured\n",
+
+            "cd /var/www/html\n",
+            "echo in the content directory of $(pwd)\n",
+     
+            "git clone ",  {"Ref": "CodeCommitRepo"}, " \n",
+            "echo project cloned\n"
+
             ]
           ]
         }
